@@ -9,6 +9,12 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pytorchltr2
+    permissions:
+      id-token: write
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -26,12 +32,8 @@ jobs:
     - name: Build source wheel
       run: |
         python setup.py sdist
-    - name: Upload wheel
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        twine upload dist/*
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
 
   deploy-macos:
 
@@ -41,6 +43,12 @@ jobs:
         python-version: [ '3.10', '3.11' ]
 
     runs-on: macos-latest
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pytorchltr2
+    permissions:
+      id-token: write
 
     steps:
     - uses: actions/checkout@v2
@@ -59,12 +67,8 @@ jobs:
     - name: Build macos wheel
       run: |
         python setup.py bdist_wheel
-    - name: Upload wheel
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        twine upload dist/*
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
 
   deploy-windows:
 
@@ -75,6 +79,12 @@ jobs:
 
     runs-on: windows-latest
 
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pytorchltr2
+    permissions:
+      id-token: write
+    
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -93,12 +103,8 @@ jobs:
     - name: Build windows wheel
       run: |
         python setup.py bdist_wheel
-    - name: Upload wheel
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        twine upload dist/*
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
 
   deploy-manylinux:
 
@@ -109,6 +115,12 @@ jobs:
 
     runs-on: ubuntu-latest
     container: quay.io/pypa/manylinux_2_28_x86_64
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pytorchltr2
+    permissions:
+      id-token: write
 
     steps:
     - uses: actions/checkout@v1
@@ -124,9 +136,5 @@ jobs:
         /opt/python/${{ matrix.python-version }}/bin/python setup.py build_ext
         /opt/python/${{ matrix.python-version }}/bin/pip wheel . --no-deps -w wheelhouse/
         for whl in wheelhouse/*.whl; do if auditwheel show "$whl"; then auditwheel repair "$whl" --plat "manylinux1_x86_64" -w ./dist/; fi; done
-    - name: Upload wheel
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        /opt/python/${{ matrix.python-version }}/bin/twine upload dist/*
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
