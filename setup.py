@@ -37,7 +37,7 @@ with open("README.md", "rt") as f:
 
 setup(
     name="pytorchltr2",
-    version="0.2.2",
+    version="0.2.2.post1",
     description="Learning to Rank with PyTorch (Fork of pytorchltr)",
     long_description=long_description,
     long_description_content_type="text/markdown",
