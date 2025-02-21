@@ -16,9 +16,9 @@ jobs:
       id-token: write
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
         architecture: 'x64'
@@ -32,38 +32,5 @@ jobs:
     - name: Build source wheel
       run: |
         python setup.py sdist
-    - name: Publish package distributions to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-
-  deploy-manylinux:
-
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [ 'cp310-cp310', 'cp311-cp311' ]
-
-    runs-on: ubuntu-latest
-    container: quay.io/pypa/manylinux2014_x86_64
-
-    environment:
-      name: pypi
-      url: https://pypi.org/p/pytorchltr2
-    permissions:
-      id-token: write
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Install dependencies
-      run: |
-        /opt/python/${{ matrix.python-version }}/bin/python -m pip install --upgrade pip setuptools wheel twine
-        /opt/python/${{ matrix.python-version }}/bin/python -m pip install -r requirements.txt
-        /opt/python/${{ matrix.python-version }}/bin/python -m pip install -r dev-requirements.txt
-    - name: Build manylinux wheel
-      env:
-        CFLAGS: -std=c99
-      run: |
-        /opt/python/${{ matrix.python-version }}/bin/python setup.py build_ext
-        /opt/python/${{ matrix.python-version }}/bin/pip wheel . --no-deps -w wheelhouse/
-        for whl in wheelhouse/*.whl; do if auditwheel show "$whl"; then auditwheel repair "$whl" --plat "manylinux2014_x86_64" -w ./dist/; fi; done
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
